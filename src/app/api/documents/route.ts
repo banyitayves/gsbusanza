@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import type { RowDataPacket } from "mysql2";
 import pool from "../db";
+import { getAuthUser } from "../auth/utils";
 
 const uploadsPath = path.join(process.cwd(), "public", "uploads");
 
@@ -13,6 +14,11 @@ async function ensureUploadsPath() {
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
+  const authUser = getAuthUser(request);
+  if (!authUser) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   const url = new URL(request.url);
   const applicationNumber = url.searchParams.get("applicationNumber") || "";
   const documentType = url.searchParams.get("type") || "";
@@ -36,6 +42,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authUser = getAuthUser(request);
+  if (!authUser) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   const formData = await request.formData();
   const applicationNumber = formData.get("applicationNumber");
   const documentType = formData.get("documentType");

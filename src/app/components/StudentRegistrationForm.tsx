@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useAuth } from "./AuthProvider";
 
 type FormState = {
   firstName: string;
@@ -13,6 +14,24 @@ type FormState = {
   parentEmail: string;
   address: string;
 };
+
+const GRADE_OPTIONS = [
+  "Nursery 1",
+  "Nursery 2",
+  "Nursery 3",
+  "Primary 1",
+  "Primary 2",
+  "Primary 3",
+  "Primary 4",
+  "Primary 5",
+  "Primary 6",
+  "Secondary 1",
+  "Secondary 2",
+  "Secondary 3",
+  "Secondary 4",
+  "Secondary 5",
+  "Secondary 6",
+];
 
 const initialFormState: FormState = {
   firstName: "",
@@ -27,6 +46,7 @@ const initialFormState: FormState = {
 };
 
 export function StudentRegistrationForm() {
+  const { user, loading } = useAuth();
   const [form, setForm] = useState<FormState>(initialFormState);
   const [status, setStatus] = useState<string | null>(null);
   const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
@@ -57,6 +77,14 @@ export function StudentRegistrationForm() {
     setApplicationNumber(data.applicationNumber);
     setStatus("Application submitted successfully.");
     setForm(initialFormState);
+  }
+
+  if (loading) {
+    return <p>Loading authentication...</p>;
+  }
+
+  if (!user) {
+    return <p className="card">Please log in as admin or staff to register students.</p>;
   }
 
   return (
@@ -116,11 +144,11 @@ export function StudentRegistrationForm() {
               onChange={(event) => setForm({ ...form, grade: event.target.value })}
             >
               <option value="">Select grade</option>
-              <option value="Grade 1">Grade 1</option>
-              <option value="Grade 2">Grade 2</option>
-              <option value="Grade 3">Grade 3</option>
-              <option value="Grade 4">Grade 4</option>
-              <option value="Grade 5">Grade 5</option>
+              {GRADE_OPTIONS.map((gradeOption) => (
+                <option key={gradeOption} value={gradeOption}>
+                  {gradeOption}
+                </option>
+              ))}
             </select>
           </label>
           <label>

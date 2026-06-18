@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useAuth } from "./AuthProvider";
 
 type DocumentRecord = {
   id: number;
@@ -14,6 +15,7 @@ type DocumentRecord = {
 };
 
 export function DocumentManagement() {
+  const { user, loading } = useAuth();
   const [applicationNumber, setApplicationNumber] = useState("");
   const [documentType, setDocumentType] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -70,6 +72,14 @@ export function DocumentManagement() {
 
     const data = await response.json();
     setResults(data.documents || []);
+  }
+
+  if (loading) {
+    return <p>Loading authentication...</p>;
+  }
+
+  if (!user) {
+    return <p className="card">Please log in as admin or staff to upload or search documents.</p>;
   }
 
   return (

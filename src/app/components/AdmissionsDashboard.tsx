@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "./AuthProvider";
 
 type Application = {
   id: number;
@@ -54,6 +55,14 @@ export function AdmissionsDashboard() {
     if (response.ok) {
       await fetchApplications();
     }
+  }
+
+  if (loading) {
+    return <p>Loading authentication...</p>;
+  }
+
+  if (!user) {
+    return <p className="card">Please log in as admin or staff to view and manage applications.</p>;
   }
 
   return (

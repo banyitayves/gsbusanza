@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "../db";
+import { getAuthUser } from "../auth/utils";
 
 const generateApplicationNumber = () => {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -8,6 +9,11 @@ const generateApplicationNumber = () => {
 };
 
 export async function GET(request: NextRequest) {
+  const authUser = getAuthUser(request);
+  if (!authUser) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   const url = new URL(request.url);
   const search = url.searchParams.get("search") || "";
   const status = url.searchParams.get("status") || "";
@@ -39,6 +45,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authUser = getAuthUser(request);
+  if (!authUser) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   const body = await request.json();
   const {
     firstName,
