@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "../../../../db";
+import pool from "../../../db";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } | Promise<{ id: string }> }
 ) {
+  const params = await context.params;
   const body = await request.json();
   const { status } = body;
 

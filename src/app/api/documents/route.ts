@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import type { RowDataPacket } from "mysql2";
 import pool from "../db";
 
 const uploadsPath = path.join(process.cwd(), "public", "uploads");
@@ -52,10 +53,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing file upload." }, { status: 400 });
   }
 
-  const [[application]] = await pool.query(
+  const [rows] = await pool.query<RowDataPacket[]>(
     "SELECT id FROM applications WHERE application_number = ? LIMIT 1",
     [applicationNumber.trim()]
   );
+  const application = rows[0] as RowDataPacket | undefined;
 
   if (!application) {
     return NextResponse.json({ error: "Application not found." }, { status: 404 });
