@@ -51,6 +51,14 @@ A React + Next.js admissions portal with MySQL support for student registration,
      uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
      FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE
    );
+
+   CREATE TABLE users (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     email VARCHAR(255) NOT NULL UNIQUE,
+     password_hash VARCHAR(255) NOT NULL,
+     role VARCHAR(24) NOT NULL,
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   );
    ```
 
 3. Add environment variables in `.env.local`:
