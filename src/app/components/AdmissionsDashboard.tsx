@@ -21,6 +21,7 @@ const statusLabel = (status: string) => {
 };
 
 export function AdmissionsDashboard() {
+  const { user, loading } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
