@@ -84,6 +84,11 @@ A React + Next.js admissions portal with MySQL support for student registration,
    npm run dev
    ```
 
+5. Log in as admin:
+
+   - Email: admin@school.com
+   - Password: Admin123!
+
 ## Notes
 
 - The backend is implemented with Next.js API routes in `src/app/api`.

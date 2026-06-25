@@ -2,6 +2,9 @@
 
 import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "./AuthProvider";
+import rwandaLocations from "../data/rwandaLocations.json";
+
+type RwandaLocations = Record<string, Record<string, Record<string, Record<string, string[]>>>>;
 
 type FormState = {
   firstName: string;
@@ -67,6 +70,13 @@ export function StudentRegistrationForm() {
   const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
   const paymentSlipRef = useRef<HTMLInputElement | null>(null);
 
+  const locationData = rwandaLocations as RwandaLocations;
+  const provinces = Object.keys(locationData);
+  const districts = form.province ? Object.keys(locationData[form.province] || {}) : [];
+  const sectors = form.province && form.district ? Object.keys(locationData[form.province][form.district] || {}) : [];
+  const cells = form.province && form.district && form.sector ? Object.keys(locationData[form.province][form.district][form.sector] || {}) : [];
+  const villages = form.province && form.district && form.sector && form.cell ? locationData[form.province][form.district][form.sector][form.cell] || [] : [];
+
   const valid = useMemo(
     () =>
       Object.values(form).every((value) => value.trim().length > 0) &&
@@ -109,6 +119,10 @@ export function StudentRegistrationForm() {
 
   if (loading) {
     return <p>Loading authentication...</p>;
+  }
+
+  if (!user) {
+    return <p className="card">Please log in as admin or staff to register students.</p>;
   }
 
   return (
@@ -197,49 +211,114 @@ export function StudentRegistrationForm() {
           </label>
           <label>
             Province
-            <input
-              className="input"
+            <select
+              className="select"
               value={form.province}
-              onChange={(event) => setForm({ ...form, province: event.target.value })}
-            />
+              onChange={(event) =>
+                setForm({
+                  ...form,
+                  province: event.target.value,
+                  district: "",
+                  sector: "",
+                  cell: "",
+                  village: "",
+                })
+              }
+            >
+              <option value="">Select province</option>
+              {provinces.map((province) => (
+                <option key={province} value={province}>
+                  {province}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
 
         <div className="grid grid-2">
           <label>
             District
-            <input
-              className="input"
+            <select
+              className="select"
               value={form.district}
-              onChange={(event) => setForm({ ...form, district: event.target.value })}
-            />
+              onChange={(event) =>
+                setForm({
+                  ...form,
+                  district: event.target.value,
+                  sector: "",
+                  cell: "",
+                  village: "",
+                })
+              }
+              disabled={!form.province}
+            >
+              <option value="">Select district</option>
+              {districts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Sector
-            <input
-              className="input"
+            <select
+              className="select"
               value={form.sector}
-              onChange={(event) => setForm({ ...form, sector: event.target.value })}
-            />
+              onChange={(event) =>
+                setForm({
+                  ...form,
+                  sector: event.target.value,
+                  cell: "",
+                  village: "",
+                })
+              }
+              disabled={!form.district}
+            >
+              <option value="">Select sector</option>
+              {sectors.map((sector) => (
+                <option key={sector} value={sector}>
+                  {sector}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
 
         <div className="grid grid-2">
           <label>
             Cell
-            <input
-              className="input"
+            <select
+              className="select"
               value={form.cell}
-              onChange={(event) => setForm({ ...form, cell: event.target.value })}
-            />
+              onChange={(event) =>
+                setForm({ ...form, cell: event.target.value, village: "" })
+              }
+              disabled={!form.sector}
+            >
+              <option value="">Select cell</option>
+              {cells.map((cell) => (
+                <option key={cell} value={cell}>
+                  {cell}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Village
-            <input
-              className="input"
+            <select
+              className="select"
               value={form.village}
               onChange={(event) => setForm({ ...form, village: event.target.value })}
-            />
+              disabled={!form.cell}
+            >
+              <option value="">Select village</option>
+              {villages.map((village) => (
+                <option key={village} value={village}>
+                  {village}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
 
