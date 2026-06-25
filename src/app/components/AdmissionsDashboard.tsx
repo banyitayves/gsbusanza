@@ -11,6 +11,13 @@ type Application = {
   grade: string;
   status: string;
   created_at: string;
+  sdms_code: string;
+  marks_obtained: string;
+  province: string;
+  district: string;
+  sector: string;
+  cell: string;
+  village: string;
 };
 
 const statusLabel = (status: string) => {
@@ -125,6 +132,11 @@ export function AdmissionsDashboard() {
                     </p>
                     <p>#{application.application_number}</p>
                     <p>{application.grade}</p>
+                    <p>SDMS: {application.sdms_code}</p>
+                    <p>Marks: {application.marks_obtained}</p>
+                    <p>
+                      Residence: {application.province}, {application.district}, {application.sector}, {application.cell}, {application.village}
+                    </p>
                   </div>
                   <span className={`status-pill ${statusLabel(application.status)}`}>
                     {application.status}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "./AuthProvider";
 
 type FormState = {
@@ -9,6 +9,13 @@ type FormState = {
   dateOfBirth: string;
   gender: string;
   grade: string;
+  province: string;
+  district: string;
+  sector: string;
+  cell: string;
+  village: string;
+  sdmsCode: string;
+  marksObtained: string;
   parentName: string;
   parentPhone: string;
   parentEmail: string;
@@ -39,6 +46,13 @@ const initialFormState: FormState = {
   dateOfBirth: "",
   gender: "",
   grade: "",
+  province: "",
+  district: "",
+  sector: "",
+  cell: "",
+  village: "",
+  sdmsCode: "",
+  marksObtained: "",
   parentName: "",
   parentPhone: "",
   parentEmail: "",
@@ -48,24 +62,34 @@ const initialFormState: FormState = {
 export function StudentRegistrationForm() {
   const { user, loading } = useAuth();
   const [form, setForm] = useState<FormState>(initialFormState);
+  const [paymentSlip, setPaymentSlip] = useState<File | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [applicationNumber, setApplicationNumber] = useState<string | null>(null);
+  const paymentSlipRef = useRef<HTMLInputElement | null>(null);
 
   const valid = useMemo(
     () =>
       Object.values(form).every((value) => value.trim().length > 0) &&
-      form.parentEmail.includes("@"),
-    [form]
+      form.parentEmail.includes("@") &&
+      paymentSlip !== null,
+    [form, paymentSlip]
   );
 
-  async function submitForm(event: React.FormEvent) {
+  async function submitForm(event: FormEvent) {
     event.preventDefault();
     setStatus(null);
 
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    if (paymentSlip) {
+      formData.append("paymentSlip", paymentSlip);
+    }
+
     const response = await fetch("/api/applications", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -77,14 +101,14 @@ export function StudentRegistrationForm() {
     setApplicationNumber(data.applicationNumber);
     setStatus("Application submitted successfully.");
     setForm(initialFormState);
+    setPaymentSlip(null);
+    if (paymentSlipRef.current) {
+      paymentSlipRef.current.value = "";
+    }
   }
 
   if (loading) {
     return <p>Loading authentication...</p>;
-  }
-
-  if (!user) {
-    return <p className="card">Please log in as admin or staff to register students.</p>;
   }
 
   return (
@@ -152,6 +176,75 @@ export function StudentRegistrationForm() {
             </select>
           </label>
           <label>
+            SDMS Code
+            <input
+              className="input"
+              value={form.sdmsCode}
+              onChange={(event) => setForm({ ...form, sdmsCode: event.target.value })}
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-2">
+          <label>
+            Marks obtained
+            <input
+              className="input"
+              type="number"
+              value={form.marksObtained}
+              onChange={(event) => setForm({ ...form, marksObtained: event.target.value })}
+            />
+          </label>
+          <label>
+            Province
+            <input
+              className="input"
+              value={form.province}
+              onChange={(event) => setForm({ ...form, province: event.target.value })}
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-2">
+          <label>
+            District
+            <input
+              className="input"
+              value={form.district}
+              onChange={(event) => setForm({ ...form, district: event.target.value })}
+            />
+          </label>
+          <label>
+            Sector
+            <input
+              className="input"
+              value={form.sector}
+              onChange={(event) => setForm({ ...form, sector: event.target.value })}
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-2">
+          <label>
+            Cell
+            <input
+              className="input"
+              value={form.cell}
+              onChange={(event) => setForm({ ...form, cell: event.target.value })}
+            />
+          </label>
+          <label>
+            Village
+            <input
+              className="input"
+              value={form.village}
+              onChange={(event) => setForm({ ...form, village: event.target.value })}
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-2">
+          <label>
             Parent/guardian name
             <input
               className="input"
@@ -180,6 +273,20 @@ export function StudentRegistrationForm() {
             />
           </label>
         </div>
+
+        <label>
+          Payment slip upload
+          <input
+            ref={paymentSlipRef}
+            className="input"
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={(event) => {
+              const file = event.target.files?.[0] || null;
+              setPaymentSlip(file);
+            }}
+          />
+        </label>
 
         <label>
           Home address
