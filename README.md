@@ -84,7 +84,13 @@ A React + Next.js admissions portal with MySQL support for student registration,
    npm run dev
    ```
 
-5. Log in as admin:
+5. Registration flow:
+
+   - Students can register themselves using the public registration form.
+   - Staff can also use the same form to register students who do not have devices.
+   - Log in as admin/staff to access the admissions dashboard and manage applications.
+
+6. Admin login:
 
    - Email: admin@school.com
    - Password: Admin123!

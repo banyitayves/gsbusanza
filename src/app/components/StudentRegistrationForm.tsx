@@ -121,10 +121,6 @@ export function StudentRegistrationForm() {
     return <p>Loading authentication...</p>;
   }
 
-  if (!user) {
-    return <p className="card">Please log in as admin or staff to register students.</p>;
-  }
-
   return (
     <div>
       <h2>Student Registration</h2>

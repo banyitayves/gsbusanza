@@ -4,7 +4,8 @@ import pool from "../../db";
 import {
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
-  createSessionCookie,
+  COOKIE_NAME,
+  COOKIE_MAX_AGE,
   createSessionToken,
   hashPassword,
   verifyPassword,
@@ -48,6 +49,8 @@ export async function POST(request: NextRequest) {
       );
       const insertId = (result as any).insertId;
       user = { id: insertId, email, password_hash: passwordHash, role: "admin" } as RowDataPacket;
+    } else if (count === 0) {
+      return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
     }
   }
 
@@ -62,12 +65,14 @@ export async function POST(request: NextRequest) {
   };
   const token = createSessionToken(authUser);
 
-  return NextResponse.json(
-    { user: { email: authUser.email, role: authUser.role } },
-    {
-      headers: {
-        "Set-Cookie": createSessionCookie(token),
-      },
-    }
-  );
+  const response = NextResponse.json({ user: { email: authUser.email, role: authUser.role } });
+  response.cookies.set(COOKIE_NAME, token, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: COOKIE_MAX_AGE,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  return response;
 }

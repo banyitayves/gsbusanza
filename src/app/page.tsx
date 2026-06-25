@@ -11,7 +11,7 @@ export default function Home() {
       <main className="container">
         <section className="card">
           <h1>School Admissions Portal</h1>
-          <p>Login as admin or staff to register students and manage admissions.</p>
+          <p>Students can register themselves here. Staff can also log in to manage applications and register students without devices.</p>
         </section>
 
         <section className="grid grid-2" style={{ marginTop: 24 }}>
